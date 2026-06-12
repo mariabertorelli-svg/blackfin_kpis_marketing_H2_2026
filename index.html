@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
             background: white;
             border-radius: 12px;
@@ -112,15 +112,15 @@
 
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
             margin-bottom: 30px;
         }
 
         .kpi-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 25px;
+            padding: 20px;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
             transition: transform 0.3s ease;
@@ -131,21 +131,21 @@
         }
 
         .kpi-label {
-            font-size: 13px;
+            font-size: 12px;
             opacity: 0.9;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-        }
-
-        .kpi-value {
-            font-size: 36px;
-            font-weight: bold;
+            letter-spacing: 0.5px;
             margin-bottom: 8px;
         }
 
+        .kpi-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
         .kpi-change {
-            font-size: 13px;
+            font-size: 12px;
             opacity: 0.85;
         }
 
@@ -159,7 +159,7 @@
 
         .charts-section {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 30px;
             margin-top: 30px;
         }
@@ -182,10 +182,14 @@
             max-height: 300px;
         }
 
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 30px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 30px;
             background: white;
             border-radius: 8px;
             overflow: hidden;
@@ -195,6 +199,8 @@
         table thead {
             background: #667eea;
             color: white;
+            position: sticky;
+            top: 0;
         }
 
         table th {
@@ -202,13 +208,15 @@
             text-align: left;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 12px;
+            font-size: 11px;
             letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
         table td {
             padding: 12px 15px;
             border-bottom: 1px solid #e0e0e0;
+            white-space: nowrap;
         }
 
         table tbody tr:hover {
@@ -219,11 +227,12 @@
             border-bottom: none;
         }
 
-        .no-data {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-            font-size: 16px;
+        .section-title {
+            font-size: 24px;
+            color: #667eea;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-weight: bold;
         }
 
         @media (max-width: 768px) {
@@ -251,7 +260,12 @@
             }
 
             .kpi-value {
-                font-size: 28px;
+                font-size: 22px;
+            }
+
+            table th, table td {
+                font-size: 10px;
+                padding: 8px;
             }
         }
     </style>
@@ -261,7 +275,7 @@
         <header>
             <div class="header-title">
                 <h1>📊 Blackfin Marketing Dashboard</h1>
-                <p>KPIs H2 2026 | Datos en tiempo real desde Google Sheets</p>
+                <p>KPIs H2 2026 | Todos los datos en tiempo real</p>
             </div>
             <div class="header-controls">
                 <input 
@@ -277,31 +291,16 @@
         <div class="content">
             <div class="status-message" id="status"></div>
 
+            <div class="section-title">📈 KPIs Principales</div>
             <div class="kpi-grid" id="kpiGrid"></div>
 
-            <div class="charts-section">
-                <div class="chart-container">
-                    <h3>📈 Tráfico web por mes</h3>
-                    <canvas id="trafficChart"></canvas>
-                </div>
-                <div class="chart-container">
-                    <h3>💰 ROI por campaña</h3>
-                    <canvas id="roiChart"></canvas>
-                </div>
-            </div>
+            <div class="section-title">📊 Gráficos</div>
+            <div class="charts-section" id="chartsSection"></div>
 
-            <div class="chart-container" style="margin-top: 30px;">
-                <h3>📋 Datos completos</h3>
+            <div class="section-title">📋 Todos los datos</div>
+            <div class="table-wrapper">
                 <table id="dataTable">
-                    <thead>
-                        <tr>
-                            <th>Mes</th>
-                            <th>Tráfico web</th>
-                            <th>Leads</th>
-                            <th>Conversiones</th>
-                            <th>ROI (%)</th>
-                        </tr>
-                    </thead>
+                    <thead id="tableHead"></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -309,8 +308,7 @@
     </div>
 
     <script>
-        let trafficChart = null;
-        let roiChart = null;
+        let charts = {};
 
         function showStatus(message, type) {
             const status = document.getElementById('status');
@@ -336,13 +334,13 @@
                 if (!response.ok) throw new Error('No se pudo cargar el archivo');
                 
                 const csv = await response.text();
-                const data = parseCSV(csv);
+                const { headers, data } = parseCSV(csv);
                 
                 if (data.length === 0) {
                     throw new Error('El archivo no contiene datos válidos');
                 }
 
-                renderDashboard(data);
+                renderDashboard(headers, data);
                 showStatus('✅ Datos cargados exitosamente', 'success');
                 localStorage.setItem('sheetUrl', url);
             } catch (error) {
@@ -353,45 +351,54 @@
 
         function parseCSV(csv) {
             const lines = csv.trim().split('\n');
-            if (lines.length < 2) return [];
+            if (lines.length < 2) return { headers: [], data: [] };
 
-            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            const headers = lines[0].split('\t').map(h => h.trim());
             const data = [];
 
             for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',').map(v => v.trim());
-                if (values.length < 2) continue;
+                const values = lines[i].split('\t').map(v => v.trim());
+                if (values.length < 2 || !values[0]) continue;
 
-                data.push({
-                    mes: values[0],
-                    trafico: parseFloat(values[1]) || 0,
-                    leads: parseInt(values[2]) || 0,
-                    conversiones: parseInt(values[3]) || 0,
-                    roi: parseFloat(values[4]) || 0
+                const row = {};
+                headers.forEach((header, idx) => {
+                    const val = values[idx] || '';
+                    row[header] = isNaN(val) ? val : parseFloat(val);
                 });
+                data.push(row);
             }
 
-            return data;
+            return { headers, data };
         }
 
-        function renderDashboard(data) {
-            renderKPIs(data);
-            renderCharts(data);
-            renderTable(data);
+        function renderDashboard(headers, data) {
+            renderKPIs(headers, data);
+            renderCharts(headers, data);
+            renderTable(headers, data);
         }
 
-        function renderKPIs(data) {
-            const totalTrafico = data.reduce((sum, d) => sum + d.trafico, 0);
-            const totalLeads = data.reduce((sum, d) => sum + d.leads, 0);
-            const totalConversiones = data.reduce((sum, d) => sum + d.conversiones, 0);
-            const avgROI = (data.reduce((sum, d) => sum + d.roi, 0) / data.length).toFixed(1);
+        function renderKPIs(headers, data) {
+            const numericColumns = headers.filter(h => {
+                const values = data.map(d => d[h]);
+                return values.some(v => !isNaN(v) && v !== '');
+            }).slice(1, 5); // Primeras 4 columnas numéricas
 
-            const kpis = [
-                { label: 'Tráfico total', value: totalTrafico.toLocaleString(), change: '+12.5%', positive: true },
-                { label: 'Total leads', value: totalLeads.toLocaleString(), change: '+8.3%', positive: true },
-                { label: 'Conversiones', value: totalConversiones.toLocaleString(), change: '-2.1%', positive: false },
-                { label: 'ROI promedio', value: avgROI + '%', change: '+15.2%', positive: true }
-            ];
+            const kpis = numericColumns.map(col => {
+                const values = data.map(d => parseFloat(d[col]) || 0).filter(v => v !== 0);
+                const total = values.reduce((a, b) => a + b, 0);
+                const avg = values.length > 0 ? (total / values.length).toFixed(1) : 0;
+                
+                const change = data.length > 1 
+                    ? (((parseFloat(data[data.length-1][col]) - parseFloat(data[0][col])) / parseFloat(data[0][col])) * 100).toFixed(1)
+                    : 0;
+
+                return {
+                    label: col,
+                    value: total > 100 ? total.toLocaleString() : avg,
+                    change: `${change > 0 ? '+' : ''}${change}%`,
+                    positive: change > 0
+                };
+            });
 
             const kpiGrid = document.getElementById('kpiGrid');
             kpiGrid.innerHTML = kpis.map(kpi => `
@@ -405,76 +412,69 @@
             `).join('');
         }
 
-        function renderCharts(data) {
-            const meses = data.map(d => d.mes);
-            const trafico = data.map(d => d.trafico);
-            const roi = data.map(d => d.roi);
+        function renderCharts(headers, data) {
+            const numericColumns = headers.filter(h => {
+                const values = data.map(d => d[h]);
+                return values.some(v => !isNaN(v) && v !== '');
+            }).slice(1, 5); // Primeras 4 columnas numéricas
 
-            // Gráfico de tráfico
-            const trafficCtx = document.getElementById('trafficChart').getContext('2d');
-            if (trafficChart) trafficChart.destroy();
-            trafficChart = new Chart(trafficCtx, {
-                type: 'line',
-                data: {
-                    labels: meses,
-                    datasets: [{
-                        label: 'Tráfico web',
-                        data: trafico,
-                        borderColor: '#667eea',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 5,
-                        pointBackgroundColor: '#667eea'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true }
-                    }
-                }
-            });
+            const meses = data.map(d => d[headers[0]]);
+            const chartsSection = document.getElementById('chartsSection');
+            chartsSection.innerHTML = '';
 
-            // Gráfico de ROI
-            const roiCtx = document.getElementById('roiChart').getContext('2d');
-            if (roiChart) roiChart.destroy();
-            roiChart = new Chart(roiCtx, {
-                type: 'bar',
-                data: {
-                    labels: meses,
-                    datasets: [{
-                        label: 'ROI (%)',
-                        data: roi,
-                        backgroundColor: 'rgba(118, 75, 162, 0.8)',
-                        borderColor: '#764ba2',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true }
+            numericColumns.forEach(col => {
+                const canvas = document.createElement('canvas');
+                canvas.id = `chart-${col}`;
+                
+                const container = document.createElement('div');
+                container.className = 'chart-container';
+                container.innerHTML = `<h3>${col}</h3>`;
+                container.appendChild(canvas);
+                chartsSection.appendChild(container);
+
+                const ctx = canvas.getContext('2d');
+                const values = data.map(d => d[col]);
+                
+                if (charts[col]) charts[col].destroy();
+                
+                charts[col] = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: meses,
+                        datasets: [{
+                            label: col,
+                            data: values,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#667eea'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
                     }
-                }
+                });
             });
         }
 
-        function renderTable(data) {
+        function renderTable(headers, data) {
+            const tableHead = document.getElementById('tableHead');
             const tbody = document.querySelector('#dataTable tbody');
-            tbody.innerHTML = data.map(d => `
-                <tr>
-                    <td>${d.mes}</td>
-                    <td>${d.trafico.toLocaleString()}</td>
-                    <td>${d.leads.toLocaleString()}</td>
-                    <td>${d.conversiones.toLocaleString()}</td>
-                    <td>${d.roi}%</td>
-                </tr>
+
+            // Crear headers
+            tableHead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+
+            // Crear filas
+            tbody.innerHTML = data.map(row => `
+                <tr>${headers.map(h => `<td>${row[h]}</td>`).join('')}</tr>
             `).join('');
         }
 
