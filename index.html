@@ -208,11 +208,11 @@
     text-transform: uppercase;
     letter-spacing: 0.8px;
     color: var(--muted);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
-  .kpi-value { font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 4px; letter-spacing: -1px; }
-  .kpi-sub { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
-  .kpi-target { font-weight: 600; }
+  .kpi-value { font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 2px; letter-spacing: -1px; }
+  .kpi-meta { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+  .kpi-target { font-weight: 600; color: var(--accent2); }
   .progress-bar-bg { height: 5px; background: var(--surface2); border-radius: 99px; overflow: hidden; margin-bottom: 8px; }
   .progress-bar-fill { height: 100%; border-radius: 99px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
   .kpi-footer { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--muted); }
@@ -220,6 +220,12 @@
   .badge-green { background: #3fb95020; color: var(--green); }
   .badge-yellow { background: #d2992220; color: var(--yellow); }
   .badge-red { background: #f8514920; color: var(--red); }
+
+  /* SEGMENTATION */
+  .segment-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+  .segment-item { flex: 1; font-size: 10px; text-align: center; }
+  .segment-label { color: var(--muted); font-weight: 500; margin-bottom: 2px; }
+  .segment-value { font-size: 14px; font-weight: 600; color: var(--accent2); }
 
   /* CHART CARD */
   .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
@@ -263,7 +269,6 @@
     <input type="text" id="sheet-url-input" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv" />
     <br>
     <button class="btn" onclick="connectSheet()">⚡ Conectar y cargar datos</button>
-    <button class="btn" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);margin-left:8px;" onclick="useDemoData()">Ver con datos de ejemplo</button>
   </div>
 </div>
 
@@ -280,7 +285,7 @@
 <div class="header">
   <div class="header-left">
     <h1>Marketing Dashboard <span>Blackfin</span></h1>
-    <p>Semestre II · Julio – Diciembre 2026 · Sector Asegurador Iberoamérica</p>
+    <p>Semestre II · Julio – Diciembre 2026 · Segmentado por región</p>
   </div>
   <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
     <div class="phase-badge">Fase 2: La Aceleración</div>
@@ -304,7 +309,7 @@
 <div class="section-header">
   <div class="icon icon-blue">🎯</div>
   <h2>Generación de Demanda</h2>
-  <span>MQL, SQL, Pipeline, Resp Time</span>
+  <span>MQL, SQL, Pipeline</span>
 </div>
 <div class="grid-4" id="section1-kpis"></div>
 <div class="grid-4" id="section1-charts"></div>
@@ -315,7 +320,7 @@
 <div class="section-header">
   <div class="icon icon-green">📣</div>
   <h2>Visibilidad de Marca</h2>
-  <span>Tráfico, LinkedIn, Engagement</span>
+  <span>Tráfico Web, LinkedIn, Engagement</span>
 </div>
 <div class="grid-3" id="section2-kpis"></div>
 <div class="grid-3" id="section2-charts"></div>
@@ -326,29 +331,18 @@
 <div class="section-header">
   <div class="icon icon-purple">🗂️</div>
   <h2>Base de Datos & CRM</h2>
-  <span>Contactos, Adopción, Calidad</span>
+  <span>Contactos, Calidad, Acciones</span>
 </div>
 <div class="grid-3" id="section3-kpis"></div>
 <div class="grid-3" id="section3-charts"></div>
 
 <!-- ══════════════════════════════════════════════════════════════════════ -->
-<!-- SECCIÓN 4: CONTENIDO & EFICIENCIA ─────────────────────────────────── -->
-<!-- ══════════════════════════════════════════════════════════════════════ -->
-<div class="section-header">
-  <div class="icon icon-orange">📊</div>
-  <h2>Contenido & Eficiencia</h2>
-  <span>Posts, Campañas, CPL, Partners</span>
-</div>
-<div class="grid-4" id="section4-kpis"></div>
-<div class="grid-4" id="section4-charts"></div>
-
-<!-- ══════════════════════════════════════════════════════════════════════ -->
 <!-- TABLA COMPLETA ─────────────────────────────────────────────────────── -->
 <!-- ══════════════════════════════════════════════════════════════════════ -->
 <div class="section-header">
-  <div class="icon icon-blue">📋</div>
+  <div class="icon icon-orange">📋</div>
   <h2>Todos los Datos</h2>
-  <span>Tabla completa H2 2026</span>
+  <span>Tabla completa H2 2026 con segmentación</span>
 </div>
 <div class="chart-card">
   <div class="table-wrapper">
@@ -373,31 +367,16 @@ let DATA = null;
 let allColumns = [];
 let charts = {};
 
-// Mapeo de columnas a secciones
-const SECTIONS = {
-  'section1': { name: 'Generación de Demanda', cols: ['mql', 'sql', 'pipeline_k_eur', 'resp_time_h'] },
-  'section2': { name: 'Visibilidad de Marca', cols: ['trafico_web', 'linkedin_impresiones', 'engagement_pct'] },
-  'section3': { name: 'Base de Datos & CRM', cols: ['contactos_crm', 'crm_adopcion_pct', 'calidad_datos_pct'] },
-  'section4': { name: 'Contenido & Eficiencia', cols: ['posts_publicados', 'campanas', 'cpl_eur', 'partnerships'] },
-};
-
-// ─── DATOS DE DEMO ────────────────────────────────────────────────────────
-const DEMO = {
-  mes:      ['Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
-  mql:      [0,0,0,0,0,0],
-  sql:      [0,1,1,1,1,1],
-  pipeline_k_eur: [75,120,145,120,160,140],
-  resp_time_h: [3,2,1.5,1,1.5,1],
-  trafico_web: [3200,4100,5000,5800,6200,7100],
-  linkedin_impresiones: [2800,3500,4200,4800,5100,5600],
-  engagement_pct: [2.8,3.2,3.8,4.1,4.5,4.8],
-  contactos_crm: [620,670,720,770,820,875],
-  crm_adopcion_pct: [78,82,88,90,93,95],
-  calidad_datos_pct: [65,70,75,78,80,83],
-  posts_publicados: [5,7,8,9,8,10],
-  campanas: [2,3,3,3,4,3],
-  cpl_eur: [1667,1250,1000,1250,833,1000],
-  partnerships: [0,1,1,2,2,3],
+// Mapeo de métricas principales
+const METRICS = {
+  'mql': { label: 'MQL', objetivo: 'mql_objetivo', iberia: 'mql_iberia', latam: 'mql_latam', mx: 'mql_mx' },
+  'sql': { label: 'SQL', objetivo: 'sql_objetivo', iberia: 'sql_iberia', latam: 'sql_latam', mx: 'sql_mx' },
+  'pipeline_k_eur': { label: 'Pipeline (€K)', objetivo: 'Objetivo_CI', iberia: null, latam: null, mx: null },
+  'trafico_web': { label: 'Tráfico Web', objetivo: 'trafico_web_obj', iberia: null, latam: null, mx: null },
+  'linkedin_impresiones': { label: 'LinkedIn Impresiones', objetivo: 'linkedin_impresiones_obj', iberia: null, latam: null, mx: null },
+  'linkedin_engagement': { label: 'Engagement LinkedIn', objetivo: null, iberia: null, latam: null, mx: null },
+  'crm_adopcion': { label: 'Adopción CRM', objetivo: null, iberia: null, latam: null, mx: null },
+  'crm_calidad_datos': { label: 'Calidad Datos', objetivo: null, iberia: null, latam: null, mx: null },
 };
 
 // ─── PARSEO CSV ───────────────────────────────────────────────────────────
@@ -440,14 +419,6 @@ function reloadData() {
   if (SHEET_URL) { SHEET_URL = localStorage.getItem(STORAGE_KEY) || SHEET_URL; init(); }
 }
 
-function useDemoData() {
-  DATA = DEMO;
-  allColumns = Object.keys(DEMO);
-  hideBanner();
-  setStatus('live', 'Datos de ejemplo activos — conecta tu Google Sheet para datos reales');
-  updateDashboard();
-}
-
 async function init() {
   if (!SHEET_URL) return;
   try {
@@ -456,7 +427,7 @@ async function init() {
     setStatus('live', `Datos cargados · actualizado ${new Date().toLocaleTimeString('es-ES')}`);
     updateDashboard();
   } catch(e) {
-    setStatus('error', `Error al cargar datos: ${e.message}. Revisa la URL o los permisos de la Sheet.`);
+    setStatus('error', `Error al cargar datos: ${e.message}`);
     console.error(e);
   }
 }
@@ -476,100 +447,170 @@ function setStatus(type, msg) {
   else { dot.innerHTML = ''; dot.className = 'dot-err'; }
 }
 
+// ─── HELPERS ───────────────────────────────────────────────────────────────
+function getMetricValue(metricCol, m) {
+  return DATA[metricCol] ? DATA[metricCol][m] : 0;
+}
+
+function getPercentProgress(actual, objetivo) {
+  if (!objetivo || objetivo === 0) return 0;
+  return Math.min(Math.max((actual / objetivo) * 100, 0), 100);
+}
+
+function getBadgeStatus(pct) {
+  if (pct >= 85) return ['badge-green', '✓ En meta'];
+  if (pct >= 60) return ['badge-yellow', '⚠ Cerca'];
+  return ['badge-red', '✗ Bajo'];
+}
+
 // ─── ACTUALIZACIÓN DEL DASHBOARD ─────────────────────────────────────────
 function updateDashboard() {
   if (!DATA) return;
   const m = parseInt(document.getElementById('monthSel').value);
 
-  Object.keys(SECTIONS).forEach(sectionKey => {
-    const cols = SECTIONS[sectionKey].cols;
-    renderSectionKPIs(sectionKey, cols, m);
-    renderSectionCharts(sectionKey, cols, m);
-  });
+  // Sección 1: MQL, SQL, Pipeline
+  renderKPICard('section1-kpis', 'mql', m, 0);
+  renderKPICard('section1-kpis', 'sql', m, 1);
+  renderKPICard('section1-kpis', 'pipeline_k_eur', m, 2);
+  
+  renderChartCard('section1-charts', 'mql', m, 0);
+  renderChartCard('section1-charts', 'sql', m, 1);
+  renderChartCard('section1-charts', 'pipeline_k_eur', m, 2);
+
+  // Sección 2: Tráfico, LinkedIn, Engagement
+  renderKPICard('section2-kpis', 'trafico_web', m, 0);
+  renderKPICard('section2-kpis', 'linkedin_impresiones', m, 1);
+  renderKPICard('section2-kpis', 'linkedin_engagement', m, 2);
+  
+  renderChartCard('section2-charts', 'trafico_web', m, 0);
+  renderChartCard('section2-charts', 'linkedin_impresiones', m, 1);
+  renderChartCard('section2-charts', 'linkedin_engagement', m, 2);
+
+  // Sección 3: CRM
+  renderKPICard('section3-kpis', 'crm_adopcion', m, 0);
+  renderKPICard('section3-kpis', 'crm_calidad_datos', m, 1);
+  
+  renderChartCard('section3-charts', 'crm_adopcion', m, 0);
+  renderChartCard('section3-charts', 'crm_calidad_datos', m, 1);
 
   renderTable();
 }
 
-// ─── RENDERIZAR KPIs DE SECCIÓN ────────────────────────────────────────────
-function renderSectionKPIs(sectionKey, cols, m) {
-  const container = document.getElementById(`${sectionKey}-kpis`);
-  container.innerHTML = '';
+// ─── RENDERIZAR KPI CON OBJETIVO ───────────────────────────────────────────
+function renderKPICard(containerId, metricKey, m, colorIdx) {
+  const container = document.getElementById(containerId);
+  const metric = METRICS[metricKey];
+  if (!metric || !DATA[metricKey]) return;
 
-  const colors = ['#58a6ff', '#3fb950', '#bc8cff', '#f0883e'];
-  const meses = DATA.mes || MONTHS;
+  const val = getMetricValue(metricKey, m);
+  const objVal = metric.objetivo ? getMetricValue(metric.objetivo, m) : null;
+  const pct = objVal ? getPercentProgress(val, objVal) : 0;
+  const [badgeCls, badgeText] = objVal ? getBadgeStatus(pct) : ['badge-yellow', '—'];
 
-  cols.forEach((col, idx) => {
-    if (!DATA[col]) return;
-    
-    const val = DATA[col][m];
-    const prev = m > 0 ? DATA[col][m-1] : val;
-    const change = prev !== 0 ? (((val - prev) / prev) * 100).toFixed(1) : 0;
-    const color = colors[idx % colors.length];
+  const colors = ['#58a6ff', '#3fb950', '#bc8cff'];
+  const color = colors[colorIdx % colors.length];
 
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <div class="kpi-label">${col.replace(/_/g, ' ').toUpperCase()}</div>
-      <div class="kpi-value" style="color:${color}">${typeof val === 'number' ? (val > 100 ? val.toLocaleString('es') : val.toFixed(1)) : val}</div>
-      <div class="kpi-sub">vs. mes anterior: <span class="kpi-target">${change > 0 ? '+' : ''}${change}%</span></div>
-      <div class="progress-bar-bg"><div class="progress-bar-fill" style="background:linear-gradient(90deg,${color},${color}dd);width:${Math.min(Math.max(Math.abs(change) * 5, 10), 100)}%"></div></div>
-      <div class="kpi-footer"><span>${meses[m]}</span><span class="badge ${change > 0 ? 'badge-green' : 'badge-red'}">${change > 0 ? '📈' : '📉'} ${Math.abs(change)}%</span></div>
+  const card = document.createElement('div');
+  card.className = 'card';
+  
+  let segmentHtml = '';
+  if (metric.iberia && DATA[metric.iberia]) {
+    const ib = getMetricValue(metric.iberia, m);
+    const la = getMetricValue(metric.latam, m);
+    const mx = getMetricValue(metric.mx, m);
+    segmentHtml = `
+      <div class="segment-row">
+        <div class="segment-item"><div class="segment-label">Iberia</div><div class="segment-value">${ib}</div></div>
+        <div class="segment-item"><div class="segment-label">LATAM</div><div class="segment-value">${la}</div></div>
+        <div class="segment-item"><div class="segment-label">MX</div><div class="segment-value">${mx}</div></div>
+      </div>
     `;
-    container.appendChild(card);
-  });
+  }
+
+  card.innerHTML = `
+    <div class="kpi-label">${metric.label}</div>
+    <div class="kpi-value" style="color:${color}">${typeof val === 'number' ? (val > 100 ? val.toLocaleString('es') : val.toFixed(1)) : val}</div>
+    ${objVal ? `<div class="kpi-meta">Objetivo: <span class="kpi-target">${objVal}</span></div>` : ''}
+    ${objVal ? `<div class="progress-bar-bg"><div class="progress-bar-fill" style="background:linear-gradient(90deg,${color},${color}dd);width:${pct}%"></div></div>` : ''}
+    <div class="kpi-footer">
+      <span>${pct.toFixed(0)}% de meta</span>
+      <span class="badge ${badgeCls}">${badgeText}</span>
+    </div>
+    ${segmentHtml}
+  `;
+  
+  container.appendChild(card);
 }
 
-// ─── RENDERIZAR GRÁFICOS DE SECCIÓN ────────────────────────────────────────
-function renderSectionCharts(sectionKey, cols, m) {
-  const container = document.getElementById(`${sectionKey}-charts`);
-  container.innerHTML = '';
+// ─── RENDERIZAR GRÁFICO ────────────────────────────────────────────────────
+function renderChartCard(containerId, metricKey, m, colorIdx) {
+  const container = document.getElementById(containerId);
+  const metric = METRICS[metricKey];
+  if (!metric || !DATA[metricKey]) return;
 
-  const colors = ['#1e6fe8', '#3fb950', '#bc8cff', '#f0883e'];
-  const meses = DATA.mes ? DATA.mes.slice(0, m+1) : MONTHS.slice(0, m+1);
+  const chartCard = document.createElement('div');
+  chartCard.className = 'chart-card';
+  chartCard.innerHTML = `
+    <div class="chart-title">${metric.label}</div>
+    <div class="chart-subtitle">H2 2026</div>
+    <div class="chart-wrap"><canvas id="chart-${metricKey}"></canvas></div>
+  `;
+  container.appendChild(chartCard);
 
-  cols.forEach((col, idx) => {
-    if (!DATA[col]) return;
+  const canvas = chartCard.querySelector('canvas');
+  const meses = DATA.mes || MONTHS;
+  const values = DATA[metricKey].slice(0, m+1);
+  const objValues = metric.objetivo && DATA[metric.objetivo] ? DATA[metric.objetivo].slice(0, m+1) : null;
 
-    const chartCard = document.createElement('div');
-    chartCard.className = 'chart-card';
-    chartCard.innerHTML = `
-      <div class="chart-title">${col.replace(/_/g, ' ')}</div>
-      <div class="chart-subtitle">H2 2026</div>
-      <div class="chart-wrap"><canvas id="chart-${col}"></canvas></div>
-    `;
-    container.appendChild(chartCard);
+  const colors = ['#1e6fe8', '#3fb950', '#bc8cff'];
+  const color = colors[colorIdx % colors.length];
 
-    const canvas = chartCard.querySelector('canvas');
-    const values = DATA[col].slice(0, m+1);
-    const chartKey = `${sectionKey}-${col}`;
-    
-    if (charts[chartKey]) charts[chartKey].destroy();
-    charts[chartKey] = new Chart(canvas.getContext('2d'), {
-      type: 'line',
-      data: {
-        labels: meses,
-        datasets: [{
-          label: col,
-          data: values,
-          borderColor: colors[idx],
-          backgroundColor: colors[idx] + '22',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 3,
-          pointBackgroundColor: colors[idx],
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { color: '#30363d44' }, ticks: { color: '#8b949e', font: { size: 10 } } },
-          y: { grid: { color: '#30363d44' }, ticks: { color: '#8b949e', font: { size: 10 } } }
-        }
-      }
+  const datasets = [{
+    label: metric.label,
+    data: values,
+    borderColor: color,
+    backgroundColor: color + '22',
+    borderWidth: 2,
+    fill: true,
+    tension: 0.4,
+    pointRadius: 3,
+    pointBackgroundColor: color,
+  }];
+
+  if (objValues) {
+    datasets.push({
+      label: 'Objetivo',
+      data: objValues,
+      borderColor: '#f0883e',
+      borderDash: [5, 5],
+      borderWidth: 2,
+      fill: false,
+      tension: 0,
+      pointRadius: 2,
+      pointBackgroundColor: '#f0883e',
     });
+  }
+
+  const chartKey = `${containerId}-${metricKey}`;
+  if (charts[chartKey]) charts[chartKey].destroy();
+  
+  charts[chartKey] = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: meses.slice(0, m+1),
+      datasets: datasets,
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#8b949e', font: { size: 10 } } },
+      },
+      scales: {
+        x: { grid: { color: '#30363d44' }, ticks: { color: '#8b949e', font: { size: 10 } } },
+        y: { grid: { color: '#30363d44' }, ticks: { color: '#8b949e', font: { size: 10 } } }
+      }
+    }
   });
 }
 
@@ -578,7 +619,6 @@ function renderTable() {
   const thead = document.getElementById('tableHead');
   const tbody = document.getElementById('tableBody');
 
-  // Headers
   const headerRow = document.createElement('tr');
   allColumns.forEach(col => {
     const th = document.createElement('th');
@@ -588,7 +628,6 @@ function renderTable() {
   thead.innerHTML = '';
   thead.appendChild(headerRow);
 
-  // Rows
   tbody.innerHTML = '';
   const meses = DATA.mes || MONTHS;
   meses.forEach((mes, idx) => {
