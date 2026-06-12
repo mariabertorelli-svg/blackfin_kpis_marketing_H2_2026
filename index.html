@@ -353,9 +353,9 @@ function parseCSV(csv){
   }
   if(cur) rawLines.push(cur);
 
-  const headers = splitRow(rawLines[0]).map(h=>h.replace(/^"|"$/g,'').trim());
+  const headers = splitRow(rawLines[1]).map(h=>h.replace(/^"|"$/g,'').trim());
   const data=[];
-  for(let i=1;i<rawLines.length;i++){
+  for(let i=2;i<rawLines.length;i++){
     const line=rawLines[i].trim();
     if(!line) continue;
     const vals=splitRow(line);
