@@ -164,26 +164,28 @@
   .controls select:focus { outline: 2px solid var(--accent); }
 
   /* GRID */
-  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
-  .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 
   /* SECTION HEADER */
   .section-header {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin: 24px 0 14px;
+    margin: 32px 0 18px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
   }
+  .section-header:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
   .section-header .icon {
-    width: 30px; height: 30px;
+    width: 32px; height: 32px;
     border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 15px;
+    font-size: 16px;
   }
-  .section-header h2 { font-size: 14px; font-weight: 600; }
-  .section-header span { color: var(--muted); font-size: 12px; }
+  .section-header h2 { font-size: 15px; font-weight: 600; }
+  .section-header span { color: var(--muted); font-size: 12px; margin-left: auto; }
   .icon-blue { background: #1e6fe822; }
   .icon-green { background: #3fb95022; }
   .icon-purple { background: #bc8cff22; }
@@ -223,7 +225,7 @@
   .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
   .chart-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
   .chart-subtitle { font-size: 11px; color: var(--muted); margin-bottom: 16px; }
-  .chart-wrap { position: relative; height: 180px; }
+  .chart-wrap { position: relative; height: 160px; }
 
   /* TABLE */
   .table-wrapper { overflow-x: auto; margin-top: 16px; }
@@ -234,10 +236,12 @@
   table tbody tr:hover { background: #21262d22; }
 
   /* RESPONSIVE */
-  @media (max-width: 900px) {
+  @media (max-width: 1200px) {
     .grid-4 { grid-template-columns: repeat(2,1fr); }
+  }
+  @media (max-width: 900px) {
     .grid-3 { grid-template-columns: repeat(2,1fr); }
-    .grid-2-1 { grid-template-columns: 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
   }
   @media (max-width: 540px) {
     .grid-4,.grid-3,.grid-2 { grid-template-columns: 1fr; }
@@ -294,20 +298,57 @@
   </div>
 </div>
 
-<!-- ── DATOS DINÁMICOS ────────────────────────────────────────────────── -->
-<div id="dynamicKpis" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 30px;"></div>
-
-<!-- ── GRÁFICOS ───────────────────────────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECCIÓN 1: GENERACIÓN DE DEMANDA ──────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
 <div class="section-header">
-  <div class="icon icon-blue">📊</div>
-  <div><h2>Gráficos</h2><span>Evolución mensual de KPIs</span></div>
+  <div class="icon icon-blue">🎯</div>
+  <h2>Generación de Demanda</h2>
+  <span>MQL, SQL, Pipeline, Resp Time</span>
 </div>
-<div id="chartsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 16px; margin-bottom: 30px;"></div>
+<div class="grid-4" id="section1-kpis"></div>
+<div class="grid-4" id="section1-charts"></div>
 
-<!-- ── TABLA DE DATOS ─────────────────────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECCIÓN 2: VISIBILIDAD DE MARCA ──────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
 <div class="section-header">
-  <div class="icon icon-orange">📋</div>
-  <div><h2>Todos los Datos</h2><span>Tabla completa H2 2026</span></div>
+  <div class="icon icon-green">📣</div>
+  <h2>Visibilidad de Marca</h2>
+  <span>Tráfico, LinkedIn, Engagement</span>
+</div>
+<div class="grid-3" id="section2-kpis"></div>
+<div class="grid-3" id="section2-charts"></div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECCIÓN 3: BASE DE DATOS & CRM ────────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div class="section-header">
+  <div class="icon icon-purple">🗂️</div>
+  <h2>Base de Datos & CRM</h2>
+  <span>Contactos, Adopción, Calidad</span>
+</div>
+<div class="grid-3" id="section3-kpis"></div>
+<div class="grid-3" id="section3-charts"></div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- SECCIÓN 4: CONTENIDO & EFICIENCIA ─────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div class="section-header">
+  <div class="icon icon-orange">📊</div>
+  <h2>Contenido & Eficiencia</h2>
+  <span>Posts, Campañas, CPL, Partners</span>
+</div>
+<div class="grid-4" id="section4-kpis"></div>
+<div class="grid-4" id="section4-charts"></div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- TABLA COMPLETA ─────────────────────────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<div class="section-header">
+  <div class="icon icon-blue">📋</div>
+  <h2>Todos los Datos</h2>
+  <span>Tabla completa H2 2026</span>
 </div>
 <div class="chart-card">
   <div class="table-wrapper">
@@ -331,6 +372,14 @@ const MONTHS = ['Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 let DATA = null;
 let allColumns = [];
 let charts = {};
+
+// Mapeo de columnas a secciones
+const SECTIONS = {
+  'section1': { name: 'Generación de Demanda', cols: ['mql', 'sql', 'pipeline_k_eur', 'resp_time_h'] },
+  'section2': { name: 'Visibilidad de Marca', cols: ['trafico_web', 'linkedin_impresiones', 'engagement_pct'] },
+  'section3': { name: 'Base de Datos & CRM', cols: ['contactos_crm', 'crm_adopcion_pct', 'calidad_datos_pct'] },
+  'section4': { name: 'Contenido & Eficiencia', cols: ['posts_publicados', 'campanas', 'cpl_eur', 'partnerships'] },
+};
 
 // ─── DATOS DE DEMO ────────────────────────────────────────────────────────
 const DEMO = {
@@ -357,7 +406,6 @@ function parseCSV(csvText) {
   const rows = result.data;
   if (!rows.length) throw new Error('La hoja está vacía');
 
-  // Convertir a formato de columnas
   allColumns = Object.keys(rows[0]);
   const data = {};
   
@@ -433,25 +481,30 @@ function updateDashboard() {
   if (!DATA) return;
   const m = parseInt(document.getElementById('monthSel').value);
 
-  renderKPIs(m);
-  renderCharts(m);
-  renderTable(m);
+  Object.keys(SECTIONS).forEach(sectionKey => {
+    const cols = SECTIONS[sectionKey].cols;
+    renderSectionKPIs(sectionKey, cols, m);
+    renderSectionCharts(sectionKey, cols, m);
+  });
+
+  renderTable();
 }
 
-// ─── RENDERIZAR KPIs ───────────────────────────────────────────────────────
-function renderKPIs(m) {
-  const container = document.getElementById('dynamicKpis');
+// ─── RENDERIZAR KPIs DE SECCIÓN ────────────────────────────────────────────
+function renderSectionKPIs(sectionKey, cols, m) {
+  const container = document.getElementById(`${sectionKey}-kpis`);
   container.innerHTML = '';
 
-  // Mostrar primeras 4 columnas numéricas (después de 'mes')
-  const numCols = allColumns.filter(col => col !== 'mes' && !isNaN(DATA[col][m])).slice(0, 4);
+  const colors = ['#58a6ff', '#3fb950', '#bc8cff', '#f0883e'];
+  const meses = DATA.mes || MONTHS;
 
-  numCols.forEach(col => {
+  cols.forEach((col, idx) => {
+    if (!DATA[col]) return;
+    
     const val = DATA[col][m];
     const prev = m > 0 ? DATA[col][m-1] : val;
     const change = prev !== 0 ? (((val - prev) / prev) * 100).toFixed(1) : 0;
-    const colors = ['#58a6ff', '#3fb950', '#bc8cff', '#f0883e'];
-    const color = colors[numCols.indexOf(col) % colors.length];
+    const color = colors[idx % colors.length];
 
     const card = document.createElement('div');
     card.className = 'card';
@@ -460,36 +513,38 @@ function renderKPIs(m) {
       <div class="kpi-value" style="color:${color}">${typeof val === 'number' ? (val > 100 ? val.toLocaleString('es') : val.toFixed(1)) : val}</div>
       <div class="kpi-sub">vs. mes anterior: <span class="kpi-target">${change > 0 ? '+' : ''}${change}%</span></div>
       <div class="progress-bar-bg"><div class="progress-bar-fill" style="background:linear-gradient(90deg,${color},${color}dd);width:${Math.min(Math.max(Math.abs(change) * 5, 10), 100)}%"></div></div>
-      <div class="kpi-footer"><span>${col}</span><span class="badge ${change > 0 ? 'badge-green' : 'badge-red'}">${change > 0 ? '📈' : '📉'} ${Math.abs(change)}%</span></div>
+      <div class="kpi-footer"><span>${meses[m]}</span><span class="badge ${change > 0 ? 'badge-green' : 'badge-red'}">${change > 0 ? '📈' : '📉'} ${Math.abs(change)}%</span></div>
     `;
     container.appendChild(card);
   });
 }
 
-// ─── RENDERIZAR GRÁFICOS ───────────────────────────────────────────────────
-function renderCharts(m) {
-  const container = document.getElementById('chartsContainer');
+// ─── RENDERIZAR GRÁFICOS DE SECCIÓN ────────────────────────────────────────
+function renderSectionCharts(sectionKey, cols, m) {
+  const container = document.getElementById(`${sectionKey}-charts`);
   container.innerHTML = '';
 
-  const numCols = allColumns.filter(col => col !== 'mes' && !isNaN(DATA[col][m])).slice(0, 4);
   const colors = ['#1e6fe8', '#3fb950', '#bc8cff', '#f0883e'];
   const meses = DATA.mes ? DATA.mes.slice(0, m+1) : MONTHS.slice(0, m+1);
 
-  numCols.forEach((col, idx) => {
+  cols.forEach((col, idx) => {
+    if (!DATA[col]) return;
+
     const chartCard = document.createElement('div');
     chartCard.className = 'chart-card';
     chartCard.innerHTML = `
       <div class="chart-title">${col.replace(/_/g, ' ')}</div>
-      <div class="chart-subtitle">Evolución H2 2026</div>
+      <div class="chart-subtitle">H2 2026</div>
       <div class="chart-wrap"><canvas id="chart-${col}"></canvas></div>
     `;
     container.appendChild(chartCard);
 
     const canvas = chartCard.querySelector('canvas');
     const values = DATA[col].slice(0, m+1);
+    const chartKey = `${sectionKey}-${col}`;
     
-    if (charts[col]) charts[col].destroy();
-    charts[col] = new Chart(canvas.getContext('2d'), {
+    if (charts[chartKey]) charts[chartKey].destroy();
+    charts[chartKey] = new Chart(canvas.getContext('2d'), {
       type: 'line',
       data: {
         labels: meses,
@@ -501,7 +556,7 @@ function renderCharts(m) {
           borderWidth: 2,
           fill: true,
           tension: 0.4,
-          pointRadius: 4,
+          pointRadius: 3,
           pointBackgroundColor: colors[idx],
         }]
       },
@@ -510,8 +565,8 @@ function renderCharts(m) {
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          x: { grid: { color: '#30363d44' }, ticks: { color: '#8b949e', font: { size: 11 } } },
-          y: { grid: { color: '#30363d44' }, ticks: { color: '#8b949e', font: { size: 11 } } }
+          x: { grid: { color: '#30363d44' }, ticks: { color: '#8b949e', font: { size: 10 } } },
+          y: { grid: { color: '#30363d44' }, ticks: { color: '#8b949e', font: { size: 10 } } }
         }
       }
     });
