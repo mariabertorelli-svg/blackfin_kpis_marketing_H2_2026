@@ -179,35 +179,13 @@ const SECTIONS = [
       {
         id:'opor', label:'Oportunidades', sublabel:'Nuevas oportunidades',
         color:'#bc8cff', icon:'🚀', iconBg:'#bc8cff22',
-        main:'Nuevos_oportunidades', target:'Objetivo_Nuevos_oportunidades',
-        regions:[],
+        main:'oportunidades', target:'Objetivo_Nuevos_oportunidades', regions:[{col:'Nuevos_oportunidades_iberia',label:'Iberia'},{col:'Nuevos_oportunidades_latam',label:'LATAM'},{col:'Nuevos_oportunidades_mx',label:'México'}],
       },
       {
         id:'gan', label:'Clientes Ganados', sublabel:'Contratos cerrados',
         color:'#f0883e', icon:'🏆', iconBg:'#f0883e22',
         main:'Clientes_ganados', target:'Objetivo_Clientes_ganados',
         regions:[],
-      },
-    ],
-  },
-  {
-    id: 'pipeline',
-    label: 'Pipeline & Eficiencia',
-    sublabel: 'Pipeline en euros · Coste por Lead',
-    icon: '💰',
-    iconBg: '#d2992222',
-    groups: [
-      {
-        id:'pipe', label:'Pipeline', sublabel:'Valor pipeline generado (€K)',
-        color:'#d29922', icon:'💶', iconBg:'#d2992222',
-        main:'pipeline_k_eur', target:null, regions:[],
-        unit:'€K',
-      },
-      {
-        id:'cpl', label:'CPL', sublabel:'Coste por Lead (€)',
-        color:'#f85149', icon:'📉', iconBg:'#f8514922',
-        main:'cpl_eur', target:null, regions:[],
-        unit:'€', invertColor:true,
       },
     ],
   },
@@ -233,22 +211,22 @@ const SECTIONS = [
       {
         id:'crm_camp', label:'Campañas', sublabel:'Campañas ejecutadas por región',
         color:'#fb923c', icon:'📧', iconBg:'#fb923c22',
-        main:'crm_campaas', target:null,
-        regions:[{col:'crm_campaas_iberia',label:'Iberia'},{col:'crm_campaas_latam',label:'LATAM'},{col:'crm_campaas_mx',label:'México'}],
+        main:'crm_campañas', target:null,
+        regions:[{col:'crm_campañas_iberia',label:'Iberia'},{col:'crm_campañas_latam',label:'LATAM'},{col:'crm_campañas_mx',label:'México'}],
         aliases:{'crm_campaas':'crm_camp','crm_campañas':'crm_camp'},
       },
       {
         id:'crm_resp', label:'Respuesta Campañas', sublabel:'Tasa de respuesta por región (%)',
         color:'#34d399', icon:'📬', iconBg:'#34d39922',
-        main:'crm_respuesta_campaas', target:null,
-        regions:[{col:'crm_respuesta_campaas_iberia',label:'Iberia'},{col:'crm_respuesta_campaas_latam',label:'LATAM'},{col:'crm_respuesta_campaas_mx',label:'México'}],
+        main:'crm_respuesta campañas', target:null,
+        regions:[{col:'crm_respuesta_campañas_iberia',label:'Iberia'},{col:'crm_respuesta_campañas_latam',label:'LATAM'},{col:'crm_respuesta_campañas_mx',label:'México'}],
       },
     ],
   },
   {
     id: 'digital',
     label: 'Visibilidad Digital',
-    sublabel: 'Web · LinkedIn · Partnerships',
+    sublabel: 'Web · LinkedIn',
     icon: '📣',
     iconBg: '#3fb95022',
     groups: [
@@ -267,11 +245,7 @@ const SECTIONS = [
         color:'#58a6ff', icon:'💬', iconBg:'#1e6fe822',
         main:'linkedin_engagement', target:'linkedin_engagement_objetivos', regions:[],
       },
-      {
-        id:'part', label:'Partnerships', sublabel:'Alianzas comerciales nuevas',
-        color:'#bc8cff', icon:'🤝', iconBg:'#bc8cff22',
-        main:'partnerships', target:null, regions:[],
-      },
+      {id:'seguidores', label:'Seguidores', sublabel:'Seguidores totales en LinkedIn', color:'#a78bfa', icon:'👤', iconBg:'#a78bfa22', main:'seguidores', target:null, regions:[]},{id:'impresiones', label:'Impresiones', sublabel:'Impresiones totales en LinkedIn', color:'#fbbf24', icon:'👁', iconBg:'#fbbf2422', main:'impresiones', target:null, regions:[]},
     ],
   },
 ];
@@ -391,7 +365,7 @@ async function loadData(){
     const sel=document.getElementById('monthSel');
     const labelCol=headers[0];
     sel.innerHTML=data.map((r,i)=>`<option value="${i}">${r[labelCol]||'Fila '+(i+1)}</option>`).join('');
-    sel.value=String(data.length-1); // default: last month
+    const monthNames=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];const currentMonthName=monthNames[new Date().getMonth()];let defaultIdx=data.findIndex(r=>norm(String(r[labelCol]))===currentMonthName);if(defaultIdx===-1) defaultIdx=data.length-1;sel.value=String(defaultIdx); // default: mes en curso
     document.getElementById('month-sel-wrap').style.display='';
 
     render();
